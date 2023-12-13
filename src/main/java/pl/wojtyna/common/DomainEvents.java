@@ -3,6 +3,7 @@ package pl.wojtyna.common;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -12,7 +13,7 @@ public class DomainEvents {
     private final List<DomainEvent> eventList;
 
     public DomainEvents() {
-        eventList = new LinkedList<>();
+        eventList = List.of();
     }
 
     private DomainEvents(List<DomainEvent> eventList) {
@@ -37,5 +38,11 @@ public class DomainEvents {
 
     public boolean hasAtLeastOneEventMatching(Predicate<DomainEvent> predicate) {
         return eventList.stream().anyMatch(predicate);
+    }
+
+    public DomainEvents following(DomainEvent event) {
+        List<DomainEvent> events = new LinkedList<>(eventList);
+        events.add(event);
+        return new DomainEvents(events);
     }
 }
