@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class AccountApplication {
 
-    private Set<Signatory> requiredSignatories;
-    private Set<Signature> signatures;
+    private final Set<Signatory> requiredSignatories;
+    private final Set<Signature> signatures;
 
     public AccountApplication(Set<Signatory> requiredSignatories) {
         this.requiredSignatories = requiredSignatories;

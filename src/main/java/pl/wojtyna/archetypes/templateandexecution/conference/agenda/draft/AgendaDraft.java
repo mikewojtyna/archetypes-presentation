@@ -1,9 +1,11 @@
 package pl.wojtyna.archetypes.templateandexecution.conference.agenda.draft;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AgendaDraft {
 
+    private UUID id;
     private String title;
     private String description;
     private List<AgendaDraftDay> days;
@@ -30,5 +32,13 @@ public class AgendaDraft {
 
     public void setDays(List<AgendaDraftDay> days) {
         this.days = days;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 }

@@ -2,7 +2,7 @@ package pl.wojtyna.archetypes.deferredcommand.bank.application;
 
 public class Applications {
 
-    private Signatories signatories;
+    private final Signatories signatories;
 
     public Applications(Signatories signatories) {
         this.signatories = signatories;
