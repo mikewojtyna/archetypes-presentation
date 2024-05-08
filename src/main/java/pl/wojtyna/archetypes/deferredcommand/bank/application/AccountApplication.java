@@ -12,35 +12,36 @@ public class AccountApplication {
 
     private final Set<Signatory> requiredSignatories;
     private final Set<Signature> signatures;
+    private boolean cancelled = false;
 
     public AccountApplication(Set<Signatory> requiredSignatories) {
-        this.requiredSignatories = requiredSignatories;
+        this.requiredSignatories = new HashSet<>(requiredSignatories);
         this.signatures = new HashSet<>();
     }
 
     public DomainEvents cancel(CancellationPolicy cancellationPolicy, Signatory signatory) {
-        if (cancellationPolicy.canBeCancelledBy(signatory) && signatures.stream()
-                                                                        .anyMatch(signature -> signature.isSignedBy(
-                                                                            signatory))) {
+        if (!cancelled && cancellationPolicy.canBeCancelledBy(signatory)) {
+            cancelled = true;
             return DomainEvents.of(new AccountApplicationCancelled());
         }
         return DomainEvents.empty();
     }
 
     public DomainResult<Optional<Account>> sign(Signature signature) {
-        if (requiredSignatories.stream().anyMatch(signature::isSignedBy)) {
+        var events = DomainEvents.empty();
+        if (requiredSignatories.removeIf(signature::isSignedBy)) {
             signatures.add(signature);
+            events = events.following(new ApplicationSigned());
         }
-        if (isSigned()) {
-            return new DomainResult<>(Optional.of(Account.open()), DomainEvents.of(new ApplicationSigned()));
+        if (isSignedByAllSignatories()) {
+            events = events.following(new ApplicationSignedByAllSignatories());
+            return new DomainResult<>(Optional.of(Account.open()),
+                                      events);
         }
-        else {
-            return new DomainResult<>(Optional.empty(), DomainEvents.empty());
-        }
+        return new DomainResult<>(Optional.empty(), events);
     }
 
-    public boolean isSigned() {
-        return signatures.stream()
-                         .allMatch(signature -> signature.isSignedByAnyOf(requiredSignatories.toArray(Signatory[]::new)));
+    public boolean isSignedByAllSignatories() {
+        return requiredSignatories.isEmpty();
     }
 }
